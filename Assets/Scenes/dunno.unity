@@ -277,7 +277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetDest: {fileID: 1152905893}
-  velocity: 2
+  velocity: 1
   rb: {fileID: 0}
   targetGameObject: {fileID: 0}
   targetCharacter: {fileID: 0}
@@ -366,6 +366,7 @@ GameObject:
   m_Component:
   - component: {fileID: 237793690}
   - component: {fileID: 237793691}
+  - component: {fileID: 237793692}
   m_Layer: 0
   m_Name: bullet_red_32px_0
   m_TagString: Untagged
@@ -443,6 +444,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &237793692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 237793689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b6635846ae303a4ca4dc185123f9e64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  direction: {x: 0, y: 0, z: 0}
+  velocity: 2
+  bulletDamage: 1
+  colliderSize: 0.7
 --- !u!1 &465943557
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,7 +559,7 @@ GameObject:
   - component: {fileID: 574438878}
   - component: {fileID: 574438877}
   m_Layer: 0
-  m_Name: 2DCamera
+  m_Name: 2d_camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -653,7 +670,7 @@ GameObject:
   - component: {fileID: 1152905895}
   - component: {fileID: 1152905896}
   m_Layer: 0
-  m_Name: hackerman
+  m_Name: hacker_man
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1058,7 +1075,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1899615302}
   - component: {fileID: 1899615303}
-  - component: {fileID: 1899615304}
   m_Layer: 0
   m_Name: wpn_cannon
   m_TagString: Untagged
@@ -1080,6 +1096,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 237793690}
+  - {fileID: 2128379175}
   m_Father: {fileID: 1152905893}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1899615303
@@ -1094,7 +1111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d98dda693bbdb14ea1c6615dd13fde8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timetoAttack: 4
+  timeToAttack: 1
   timer: 0
   mouseWorldPosition: {x: 0, y: 0, z: 0}
   mouseScreenPosition: {x: 0, y: 0}
@@ -1103,54 +1120,57 @@ MonoBehaviour:
   moveOffset: {x: 0, y: 0}
   angle: 0
   distanceFromPlayer: 5
-  player: {fileID: 0}
+  playerTransform: {fileID: 1152905893}
   bulletDamage: 5
---- !u!61 &1899615304
-BoxCollider2D:
+  bulletPreFab: {fileID: 237793689}
+--- !u!1 &1946835326
+GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1899615301}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1946835328}
+  - component: {fileID: 1946835327}
+  m_Layer: 0
+  m_Name: enemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1946835327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946835326}
   m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.15, y: 0.13}
-  m_EdgeRadius: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d43f3bec22405ad40b626f112490a7ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemy: {fileID: 155288715}
+  spawnArea: {x: 10, y: 0}
+  spawnTimer: 2
+  target: {fileID: 1152905888}
+--- !u!4 &1946835328
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946835326}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2013657228
 GameObject:
   m_ObjectHideFlags: 0
@@ -1321,6 +1341,37 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!1 &2128379174
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2128379175}
+  m_Layer: 0
+  m_Name: bullet_spawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2128379175
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128379174}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.1, y: -0.01, z: -1.1928406}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1899615302}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1330,3 +1381,4 @@ SceneRoots:
   - {fileID: 574438879}
   - {fileID: 465943559}
   - {fileID: 155288718}
+  - {fileID: 1946835328}

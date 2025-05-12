@@ -1,11 +1,15 @@
-using NUnit.Framework.Internal;
+using System;
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class WeaponCannon : MonoBehaviour
 {
 
-    public float timetoAttack = 4.0f;
+    public float timeToAttack = 1.0f;
     public float timer; 
 
     public Vector3 mouseWorldPosition;
@@ -17,15 +21,17 @@ public class WeaponCannon : MonoBehaviour
     
     public float distanceFromPlayer = 1.0f;
 
-    public Transform player;
+    public Transform playerTransform;
     private Camera mainCamera;
 
     public int bulletDamage = 5;
 
+    public GameObject bulletPreFab;
+
     void Start()
     {
         mainCamera = Camera.main;
-        player = transform.parent;
+        playerTransform = transform.parent;
     }
 
     void Update()
@@ -42,10 +48,37 @@ public class WeaponCannon : MonoBehaviour
         rotateTowardsCursor();
         moveAroundPlayer();
         
-        timer -= Time.deltaTime;
-        if (timer < 0.0f) {
-            Attack();
+        if (timer < timeToAttack) {
+            timer += Time.deltaTime;
+            return;
         }
+
+        timer = 0;
+        spawnBullet();
+    }
+
+    private void spawnBullet()
+    {
+        GameObject bullet = Instantiate(bulletPreFab);
+        bullet.transform.rotation = getRotationForNewSpawn();
+        bullet.transform.position = getPositionForNewSpawn();
+        
+        bullet.GetComponent<BulletProjectile>().setDirection(bullet.transform.position.x, bullet.transform.position.y);
+        bullet.SetActive(true);
+        
+    }
+
+    private Vector3 getPositionForNewSpawn()
+    {
+        Vector2 newSpawnMoveDirection = (mouseWorldPosition - playerTransform.position).normalized;
+        Vector2 offset = newSpawnMoveDirection * distanceFromPlayer;
+        return playerTransform.position + (Vector3)(moveDirection * distanceFromPlayer);
+    }
+
+    private Quaternion getRotationForNewSpawn()
+    {
+        float newSpawnAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        return Quaternion.Euler(new Vector3(0,0,newSpawnAngle));
     }
 
     void FixedUpdate()
@@ -60,17 +93,15 @@ public class WeaponCannon : MonoBehaviour
 
     private void moveAroundPlayer() 
     {        
-        moveDirection = (mouseWorldPosition - player.position).normalized;
+        moveDirection = (mouseWorldPosition - playerTransform.position).normalized;
         moveOffset = moveDirection * distanceFromPlayer;
-        transform.position = player.position + (Vector3)(moveDirection * distanceFromPlayer);
+        transform.position = playerTransform.position + (Vector3)(moveDirection + moveOffset);
     }
 
     private void Attack() 
     {
-        timer = timetoAttack;
-
+        // timer = timeToAttack;
         // launch bullet projectiles
-
         // ApplyDamage(bulletDamage);
     }
 

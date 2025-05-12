@@ -29,7 +29,11 @@ public class Enemy : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        targetGameObject = targetDest.gameObject;
+    }
+
+    public void setTarget(GameObject target) {
+        targetGameObject = target;
+        targetDest = target.transform;
     }
 
     public void takeDamage(int damage)
