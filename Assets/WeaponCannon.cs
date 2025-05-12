@@ -1,4 +1,4 @@
-using Unity.Cinemachine;
+using NUnit.Framework.Internal;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,6 +19,8 @@ public class WeaponCannon : MonoBehaviour
 
     public Transform player;
     private Camera mainCamera;
+
+    public int bulletDamage = 5;
 
     void Start()
     {
@@ -66,5 +68,18 @@ public class WeaponCannon : MonoBehaviour
     private void Attack() 
     {
         timer = timetoAttack;
+
+        // launch bullet projectiles
+
+        // ApplyDamage(bulletDamage);
+    }
+
+    private void ApplyDamage(Collider2D[] colliders) {
+         for (int i = 0; i < colliders.Length; ++i) {
+            Enemy e = colliders[i].GetComponent<Enemy>();
+            if (e != null) {
+                 colliders[i].GetComponent<Enemy>().takeDamage(bulletDamage);
+            }
+        }
     }
 }
