@@ -14,12 +14,7 @@ public class BulletProjectile : MonoBehaviour
 
     public void setDirection(float x, float y) {
         direction = new Vector3(x, y);
-        
-        
         // if (x < 0) {
-        //     Vector3 scale = transform.localScale;
-        //     scale.x = scale.x * -1;
-        //     transform.localScale = scale;
         // }
     }
 

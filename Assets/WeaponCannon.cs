@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Quaternion = UnityEngine.Quaternion;
@@ -9,29 +10,32 @@ using Vector3 = UnityEngine.Vector3;
 public class WeaponCannon : MonoBehaviour
 {
 
-    public float timeToAttack = 1.0f;
-    public float timer; 
+    public float autoAttackTimer = 1.0f;
+    public float bulletSpawnTimer; 
 
     public Vector3 mouseWorldPosition;
     public Vector2 mouseScreenPosition;
-    public Vector2 direction;
-    public Vector2 moveDirection;
+    public Vector3 normalizedMouseDireciton;
     public Vector2 moveOffset;
     public float angle;
-    
     public float distanceFromPlayer = 1.0f;
 
     public Transform playerTransform;
     private Camera mainCamera;
 
+    // private SpriteRenderer sr;
+
     public int bulletDamage = 5;
 
     public GameObject bulletPreFab;
+
 
     void Start()
     {
         mainCamera = Camera.main;
         playerTransform = transform.parent;
+        // sr = GetComponent<SpriteRenderer>();
+        // sr.enabled = false;
     }
 
     void Update()
@@ -43,17 +47,20 @@ public class WeaponCannon : MonoBehaviour
             new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, mainCamera.nearClipPlane));
         
         // direction from the bullet's current rotation to the mouse
-        direction = (mouseWorldPosition - transform.position).normalized;
-
+        normalizedMouseDireciton = (mouseWorldPosition - playerTransform.position).normalized;
+        
+        // reticule
         rotateTowardsCursor();
         moveAroundPlayer();
         
-        if (timer < timeToAttack) {
-            timer += Time.deltaTime;
+        // bullets
+        if (bulletSpawnTimer < autoAttackTimer)
+        {
+            bulletSpawnTimer += Time.deltaTime;
             return;
         }
 
-        timer = 0;
+        bulletSpawnTimer = 0;
         spawnBullet();
     }
 
@@ -61,23 +68,26 @@ public class WeaponCannon : MonoBehaviour
     {
         GameObject bullet = Instantiate(bulletPreFab);
         bullet.transform.rotation = getRotationForNewSpawn();
-        bullet.transform.position = getPositionForNewSpawn();
+        bullet.transform.position = getPositionForNewSpawn(bullet);
         
         bullet.GetComponent<BulletProjectile>().setDirection(bullet.transform.position.x, bullet.transform.position.y);
         bullet.SetActive(true);
-        
     }
 
-    private Vector3 getPositionForNewSpawn()
+    private Vector3 getPositionForNewSpawn(GameObject bullet)
     {
-        Vector2 newSpawnMoveDirection = (mouseWorldPosition - playerTransform.position).normalized;
-        Vector2 offset = newSpawnMoveDirection * distanceFromPlayer;
-        return playerTransform.position + (Vector3)(moveDirection * distanceFromPlayer);
+        float bulletAngleInRadians = bullet.transform.rotation.eulerAngles.z * Mathf.Deg2Rad;
+
+        float x = distanceFromPlayer * Mathf.Cos(bulletAngleInRadians);
+        float y = distanceFromPlayer * Mathf.Sin(bulletAngleInRadians);
+
+        Vector3 bulletPos = new Vector3(x, y, 0);
+        return playerTransform.position + bulletPos;
     }
 
     private Quaternion getRotationForNewSpawn()
     {
-        float newSpawnAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        float newSpawnAngle = Mathf.Atan2(normalizedMouseDireciton.y, normalizedMouseDireciton.x) * Mathf.Rad2Deg;
         return Quaternion.Euler(new Vector3(0,0,newSpawnAngle));
     }
 
@@ -85,17 +95,24 @@ public class WeaponCannon : MonoBehaviour
     {
     }
 
-    private void rotateTowardsCursor() 
+    private void rotateTowardsCursor()
     {
-        angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(new Vector3(0,0, angle));
+        angle = Mathf.Atan2(normalizedMouseDireciton.y, normalizedMouseDireciton.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
     }
 
-    private void moveAroundPlayer() 
-    {        
-        moveDirection = (mouseWorldPosition - playerTransform.position).normalized;
-        moveOffset = moveDirection * distanceFromPlayer;
-        transform.position = playerTransform.position + (Vector3)(moveDirection + moveOffset);
+
+
+    private void moveAroundPlayer()
+    {
+        // use the angle instead of this unit vector
+        float angleInRadians = angle * Mathf.Deg2Rad;
+        float x = distanceFromPlayer * Mathf.Cos(angleInRadians);
+        float y = distanceFromPlayer * Mathf.Sin(angleInRadians);
+
+        Vector3 reticulePos = new Vector3(x, y, 0);
+
+        transform.position = playerTransform.position + reticulePos;
     }
 
     private void Attack() 
