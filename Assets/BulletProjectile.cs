@@ -3,8 +3,11 @@ using UnityEngine;
 public class BulletProjectile : MonoBehaviour
 {
 
-    public Vector3 direction;
-    public float velocity; 
+    public Vector3 m_direction;
+    public Vector3 m_spawnPos;
+    public float m_angle;
+
+    public float m_velocity;
     
     public int bulletDamage;
 
@@ -13,7 +16,7 @@ public class BulletProjectile : MonoBehaviour
     bool hitDetected = false;
 
     public void setDirection(float x, float y) {
-        direction = new Vector3(x, y);
+        m_direction = new Vector3(x, y);
         // if (x < 0) {
         // }
     }
@@ -25,7 +28,7 @@ public class BulletProjectile : MonoBehaviour
 
     void Update()
     {
-        transform.position += direction * velocity * Time.deltaTime;
+        transform.position += m_direction * m_velocity * Time.deltaTime;
 
         Collider2D[] hit = Physics2D.OverlapCircleAll(transform.position, colliderSize);
 

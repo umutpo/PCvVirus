@@ -456,8 +456,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b6635846ae303a4ca4dc185123f9e64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  direction: {x: 0, y: 0, z: 0}
-  velocity: 2
+  m_direction: {x: 0, y: 0, z: 0}
+  m_spawnPos: {x: 0, y: 0, z: 0}
+  m_angle: 0
+  m_velocity: 0
   bulletDamage: 1
   colliderSize: 0.7
 --- !u!1 &465943557
@@ -1119,7 +1121,7 @@ MonoBehaviour:
   normalizedMouseDireciton: {x: 0, y: 0, z: 0}
   moveOffset: {x: 0, y: 0}
   angle: 0
-  distanceFromPlayer: 5
+  distanceFromPlayer: 1
   playerTransform: {fileID: 1152905893}
   bulletDamage: 5
   bulletPreFab: {fileID: 237793689}
@@ -1155,7 +1157,7 @@ MonoBehaviour:
   enemy: {fileID: 155288715}
   spawnArea: {x: 10, y: 0}
   spawnTimer: 2
-  spawnEnemies: 0
+  spawnEnemies: 1
   target: {fileID: 1152905888}
 --- !u!4 &1946835328
 Transform:
