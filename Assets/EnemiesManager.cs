@@ -38,7 +38,6 @@ public class EnemiesManager : MonoBehaviour
             // better if it's near the player i guess?
             newSpawnPosition += target.transform.position;
 
-
             GameObject newEnemy = Instantiate(enemy);
             newEnemy.transform.position = newSpawnPosition;
             newEnemy.GetComponent<Enemy>().setTarget(target);

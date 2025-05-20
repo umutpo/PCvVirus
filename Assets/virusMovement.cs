@@ -10,9 +10,6 @@ public class virusMovement : MonoBehaviour
     public float targetVelocity = 5f;
     public float maxVelocity = 10f;
     public float acceleration = 0.5f;
-    public float m_angleRelativeToOrigin;
-    public float m_distanceToOrigin;
-    public Transform targetTest;
 
     [Header("Input Actions")]
     public InputActionReference moveInput;
@@ -75,14 +72,7 @@ public class virusMovement : MonoBehaviour
         else
         {
             Debug.LogWarning("Move input action is not set.");
-        }
-        
-        m_distanceToOrigin = Vector3.Distance(transform.position, Vector3.zero);
-
-
-        Vector3 from = targetTest.position - transform.position;
-        Vector3 to = transform.up;
-        m_angleRelativeToOrigin = Vector3.Angle(from, to);
+        }        
     }
 
     private void FixedUpdate()

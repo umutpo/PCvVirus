@@ -9,8 +9,8 @@ public class Enemy : MonoBehaviour
 
     public Transform targetDest;
     public float velocity;
-    public float m_rotationSpeed = 5.0f;
-    public float m_currentAngleRelativeToTarget;
+    public float m_rotationSpeed = 2.0f;
+    public float m_currentAngleRelativeToTargetDeg;
     public Rigidbody2D rb;
 
     public GameObject targetGameObject;
@@ -23,6 +23,8 @@ public class Enemy : MonoBehaviour
     public float m_targetMinRadiusToProtect;
 
     public float m_distanceToTarget;
+
+    bool m_isOrbiting = false;
 
     private void Attack()
     {
@@ -80,12 +82,11 @@ public class Enemy : MonoBehaviour
         if (targetGameObject != null)
         {
             m_distanceToTarget = Vector3.Distance(transform.position, targetGameObject.transform.position);
-            m_currentAngleRelativeToTarget = Vector3.Angle(transform.position, targetDest.position);
-            Debug.DrawLine(Vector3.zero, transform.position, Color.red);
-            Debug.DrawLine(Vector3.zero, targetDest.position, Color.green);
 
             if (m_distanceToTarget > m_targetMaxRadiusToProtect)
             {
+                m_isOrbiting = false;
+
                 // accelerate towards the target
                 directionToMove = (targetDest.position - transform.position).normalized;
                 rb.linearVelocity = directionToMove * velocity;
@@ -93,15 +94,28 @@ public class Enemy : MonoBehaviour
 
             else
             {
-                // now start orbiting the target
-                // m_currentAngleRelativeToTarget += m_rotationSpeed * Time.deltaTime;
+                // entering the orbit range, set the initial direction
+                if (m_isOrbiting == false)
+                {
+                    Vector3 direction = (transform.position - targetDest.position).normalized;
+                    m_currentAngleRelativeToTargetDeg = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                    m_isOrbiting = true;
+                }
+                
+                else
+                {
+                    // otherwise increment the angle by rotationSpeed
+                    m_currentAngleRelativeToTargetDeg += m_rotationSpeed * Time.fixedDeltaTime;
+                    float angleRad = m_currentAngleRelativeToTargetDeg * Mathf.Deg2Rad;
 
+                    Vector3 orbitPosition = targetDest.position + new Vector3(
+                        Mathf.Cos(angleRad) * m_targetMinRadiusToProtect,
+                        Mathf.Sin(angleRad) * m_targetMinRadiusToProtect,
+                        0f
+                    );
 
-                // Vector3 offset = new Vector3(Mathf.Cos(m_currentAngleRelativeToTarget), Mathf.Sin(m_currentAngleRelativeToTarget), 0);
-                // Vector3 newPosition = targetDest.position + offset * m_targetMaxRadiusToProtect;
-
-                // rb.MovePosition(Vector3.MoveTowards(transform.position, newPosition, velocity * Time.deltaTime));
-                // Debug.DrawRay(transform.position, newPosition, Color.red);
+                    rb.linearVelocity = (orbitPosition - transform.position) / Time.fixedDeltaTime;
+                }
             }
         }
         else {

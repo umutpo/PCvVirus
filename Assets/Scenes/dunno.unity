@@ -246,15 +246,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetDest: {fileID: 0}
   velocity: 1
-  m_rotationSpeed: 5
-  m_currentAngleRelativeToTarget: 0
+  m_rotationSpeed: 50
+  m_currentAngleRelativeToTargetDeg: 0
   rb: {fileID: 0}
   targetGameObject: {fileID: 0}
   targetCharacter: {fileID: 0}
   hp: 10
   collisionDamage: 1
   m_targetMaxRadiusToProtect: 3
-  m_targetMinRadiusToProtect: 1
+  m_targetMinRadiusToProtect: 2
   m_distanceToTarget: 0
 --- !u!50 &155288720
 Rigidbody2D:
@@ -890,8 +890,6 @@ MonoBehaviour:
   targetVelocity: 5
   maxVelocity: 0
   acceleration: 0.5
-  m_angleRelativeToOrigin: 0
-  m_distanceToOrigin: 0
   moveInput: {fileID: 1460359454481324324, guid: e3f933ee76548d147af733a1a23b1f4c, type: 3}
   fireInput: {fileID: -8865650105791775801, guid: e3f933ee76548d147af733a1a23b1f4c, type: 3}
 --- !u!114 &1152905895
@@ -1175,7 +1173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d98dda693bbdb14ea1c6615dd13fde8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rateOfFire: 0.1
+  rateOfFire: 0.05
   mouseWorldPosition: {x: 0, y: 0, z: 0}
   mouseScreenPosition: {x: 0, y: 0}
   normalizedMouseDireciton: {x: 0, y: 0, z: 0}
@@ -1271,7 +1269,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemy: {fileID: 155288715}
   spawnArea: {x: 10, y: 0}
-  spawnTimer: 1000
+  spawnTimer: 2
   spawnEnemies: 1
   target: {fileID: 201115959}
 --- !u!4 &1946835328
