@@ -15,15 +15,13 @@ public class BulletProjectile : MonoBehaviour
 
     bool hitDetected = false;
 
-    public void setDirection(float x, float y) {
-        m_direction = new Vector3(x, y);
-        // if (x < 0) {
-        // }
+    public void setDirection(Vector3 normalizedDirection, float x, float y)
+    {
+        m_direction = normalizedDirection;
     }
 
     void Start()
     {
-        
     }
 
     void Update()

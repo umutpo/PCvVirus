@@ -34,8 +34,6 @@ public class WeaponCannon : MonoBehaviour
     {
         mainCamera = Camera.main;
         playerTransform = transform.parent;
-        // sr = GetComponent<SpriteRenderer>();
-        // sr.enabled = false;
     }
 
     void Update()
@@ -70,7 +68,7 @@ public class WeaponCannon : MonoBehaviour
         bullet.transform.rotation = getRotationForNewSpawn();
         bullet.transform.position = getPositionForNewSpawn(bullet);
         
-        bullet.GetComponent<BulletProjectile>().setDirection(bullet.transform.position.x, bullet.transform.position.y);
+        bullet.GetComponent<BulletProjectile>().setDirection(normalizedMouseDireciton, bullet.transform.position.x, bullet.transform.position.y);
         bullet.SetActive(true);
     }
 
