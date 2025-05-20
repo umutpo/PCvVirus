@@ -40,7 +40,7 @@ public class BulletProjectile : MonoBehaviour
             }
         }
 
-        if (hitDetected == true) {
+        if (hitDetected) {
             Destroy(gameObject);
         }
     }

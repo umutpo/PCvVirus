@@ -42,6 +42,7 @@ public class EnemiesManager : MonoBehaviour
             GameObject newEnemy = Instantiate(enemy);
             newEnemy.transform.position = newSpawnPosition;
             newEnemy.GetComponent<Enemy>().setTarget(target);
+            newEnemy.gameObject.SetActive(true);
         }
     }
 }

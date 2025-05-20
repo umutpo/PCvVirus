@@ -15,9 +15,12 @@ public class virusMovement : MonoBehaviour
     public InputActionReference moveInput;
     public InputActionReference fireInput;
 
+    private GameObject weapon;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        weapon = transform.Find("weapon").gameObject;
     }
 
     void Start()
@@ -29,7 +32,8 @@ public class virusMovement : MonoBehaviour
     {
         if (fireInput != null && fireInput.action != null)
         {
-            fireInput.action.started += Fire;
+            fireInput.action.performed += Fire;
+            fireInput.action.Enable();
         }
         else
         {
@@ -100,6 +104,7 @@ public class virusMovement : MonoBehaviour
 
     private void Fire(InputAction.CallbackContext obj)
     {
-        Debug.Log("Fired");
+        WeaponCannon weaponCannon = weapon.GetComponent<WeaponCannon>();
+        weaponCannon.Attack();
     }
 }

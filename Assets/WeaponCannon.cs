@@ -10,15 +10,15 @@ using Vector3 = UnityEngine.Vector3;
 public class WeaponCannon : MonoBehaviour
 {
 
-    public float autoAttackTimer = 1.0f;
-    public float bulletSpawnTimer; 
+    public float rateOfFire = 0.25f; 
+    private float timerSinceLastShot = 0.0f;
 
     public Vector3 mouseWorldPosition;
     public Vector2 mouseScreenPosition;
     public Vector3 normalizedMouseDireciton;
     public Vector2 moveOffset;
     public float angle;
-    public float distanceFromPlayer = 1.0f;
+    public float distanceFromPlayer = 0.5f;
 
     public Transform playerTransform;
     private Camera mainCamera;
@@ -51,15 +51,7 @@ public class WeaponCannon : MonoBehaviour
         rotateTowardsCursor();
         moveAroundPlayer();
         
-        // bullets
-        if (bulletSpawnTimer < autoAttackTimer)
-        {
-            bulletSpawnTimer += Time.deltaTime;
-            return;
-        }
-
-        bulletSpawnTimer = 0;
-        spawnBullet();
+        timerSinceLastShot += Time.deltaTime;
     }
 
     private void spawnBullet()
@@ -99,8 +91,6 @@ public class WeaponCannon : MonoBehaviour
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
     }
 
-
-
     private void moveAroundPlayer()
     {
         // use the angle instead of this unit vector
@@ -113,19 +103,12 @@ public class WeaponCannon : MonoBehaviour
         transform.position = playerTransform.position + reticulePos;
     }
 
-    private void Attack() 
+    public void Attack() 
     {
-        // timer = timeToAttack;
-        // launch bullet projectiles
-        // ApplyDamage(bulletDamage);
-    }
-
-    private void ApplyDamage(Collider2D[] colliders) {
-         for (int i = 0; i < colliders.Length; ++i) {
-            Enemy e = colliders[i].GetComponent<Enemy>();
-            if (e != null) {
-                 colliders[i].GetComponent<Enemy>().takeDamage(bulletDamage);
-            }
+        Debug.Log("TRYING TO SHOOT");
+        if (timerSinceLastShot > rateOfFire) {
+            spawnBullet();
+            timerSinceLastShot = 0.0f;
         }
     }
 }

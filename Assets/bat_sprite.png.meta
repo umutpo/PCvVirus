@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: deab2d5558e34bb4584a476b54f09000
+guid: 5bd79895f084de342944ade4aab00d1b
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -43,7 +43,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -81,7 +81,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -109,10 +109,10 @@ TextureImporter:
       name: bat_sprite_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 64
-        width: 32
-        height: 32
+        x: 4
+        y: 75
+        width: 24
+        height: 9
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -131,10 +131,10 @@ TextureImporter:
       name: bat_sprite_1
       rect:
         serializedVersion: 2
-        x: 0
-        y: 32
-        width: 32
-        height: 32
+        x: 3
+        y: 43
+        width: 26
+        height: 8
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -153,10 +153,10 @@ TextureImporter:
       name: bat_sprite_2
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 32
-        height: 32
+        x: 4
+        y: 9
+        width: 24
+        height: 11
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -175,7 +175,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: f7376ad3b13704745947fd2fb6829bc8
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
