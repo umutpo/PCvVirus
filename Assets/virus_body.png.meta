@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      virus_body_0: 8614388274288509348
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
