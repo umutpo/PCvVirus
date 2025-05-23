@@ -1,5 +1,7 @@
 using System;
+using Unity.Netcode;
 using UnityEditor.Rendering.Universal;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.TextCore.Text;
@@ -22,7 +24,10 @@ public class Enemy : MonoBehaviour
     public float m_targetMaxRadiusToProtect;
     public float m_targetMinRadiusToProtect;
 
+    public RadialPath m_radialPath;
+    public PathingType m_pathingType;
     public float m_distanceToTarget;
+
 
     bool m_isOrbiting = false;
 
@@ -41,9 +46,15 @@ public class Enemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    public void setTarget(GameObject target) {
+    public void setTarget(GameObject target)
+    {
         targetGameObject = target;
         targetDest = target.transform;
+    }
+
+    public void setRadialPath(RadialPath rp)
+    {
+        m_radialPath = rp;
     }
 
     public void takeDamage(int damage)
@@ -54,6 +65,12 @@ public class Enemy : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    public void moveTowardsTarget()
+    {
+        Vector3 directionToMove = (targetDest.position - transform.position).normalized;
+        rb.linearVelocity = directionToMove * velocity;
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -71,54 +88,69 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        
+
     }
 
     void FixedUpdate()
     {
-
         Vector3 directionToMove = Vector3.zero;
 
         if (targetGameObject != null)
         {
             m_distanceToTarget = Vector3.Distance(transform.position, targetGameObject.transform.position);
 
-            if (m_distanceToTarget > m_targetMaxRadiusToProtect)
+            switch (m_pathingType)
             {
-                m_isOrbiting = false;
+                case PathingType.Target:
+                    moveTowardsTarget();
+                    break;
 
-                // accelerate towards the target
-                directionToMove = (targetDest.position - transform.position).normalized;
-                rb.linearVelocity = directionToMove * velocity;
-            }
+                case PathingType.Radial:
 
-            else
-            {
-                // entering the orbit range, set the initial direction
-                if (m_isOrbiting == false)
-                {
-                    Vector3 direction = (transform.position - targetDest.position).normalized;
-                    m_currentAngleRelativeToTargetDeg = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                    m_isOrbiting = true;
-                }
-                
-                else
-                {
-                    // otherwise increment the angle by rotationSpeed
-                    m_currentAngleRelativeToTargetDeg += m_rotationSpeed * Time.fixedDeltaTime;
-                    float angleRad = m_currentAngleRelativeToTargetDeg * Mathf.Deg2Rad;
+                    if (m_distanceToTarget > m_radialPath.m_outerRadius)
+                    {
+                        m_isOrbiting = false;
+                        moveTowardsTarget();
+                    }
 
-                    Vector3 orbitPosition = targetDest.position + new Vector3(
-                        Mathf.Cos(angleRad) * m_targetMinRadiusToProtect,
-                        Mathf.Sin(angleRad) * m_targetMinRadiusToProtect,
-                        0f
-                    );
+                    else
+                    {
+                        // entering the orbit range, set the initial direction
+                        if (m_isOrbiting == false)
+                        {
+                            Vector3 direction = (transform.position - targetDest.position).normalized;
+                            m_currentAngleRelativeToTargetDeg = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                            m_isOrbiting = true;
+                        }
 
-                    rb.linearVelocity = (orbitPosition - transform.position) / Time.fixedDeltaTime;
-                }
+                        else
+                        {
+                            // otherwise increment the angle by rotationSpeed
+                            m_currentAngleRelativeToTargetDeg += m_rotationSpeed * Time.fixedDeltaTime;
+                            float angleRad = m_currentAngleRelativeToTargetDeg * Mathf.Deg2Rad;
+
+                            // I need a smoother entrance into the orbit, and I would like the orbit to have 
+                            // some structure to it, like when ants move, you can see their structure and
+                            // "descipline" 
+                            // but how...?
+
+                            Vector3 orbitPosition = targetDest.position + new Vector3(
+                                Mathf.Cos(angleRad) * m_targetMinRadiusToProtect,
+                                Mathf.Sin(angleRad) * m_targetMinRadiusToProtect,
+                                0f
+                            );
+
+                            rb.linearVelocity = (orbitPosition - transform.position) / Time.fixedDeltaTime;
+                        }
+
+                        // next thing i wanna do is control velocity of the objects to kill the deadspace inside
+                        // probably should have points sent to it by enemiesManager...
+                    }
+                    break;
             }
         }
-        else {
+        else
+        {
             directionToMove = Vector3.zero;
         }
     }

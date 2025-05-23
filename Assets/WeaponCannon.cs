@@ -105,7 +105,7 @@ public class WeaponCannon : MonoBehaviour
 
     public void Attack() 
     {
-        Debug.Log("TRYING TO SHOOT");
+        // Debug.Log("TRYING TO SHOOT");
         if (timerSinceLastShot > rateOfFire) {
             spawnBullet();
             timerSinceLastShot = 0.0f;
