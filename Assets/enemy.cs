@@ -134,6 +134,10 @@ public class Enemy : MonoBehaviour
                             m_currentAngleRelativeToTargetDeg += m_rotationSpeed * Time.fixedDeltaTime;
                             float angleRad = m_currentAngleRelativeToTargetDeg * Mathf.Deg2Rad;
 
+                            // now here I want to control how much speed so that they stay in a specific rotating orbit position
+                            // so they accelrate to their position in a natural way and then stay at a constant "swarm velocity"
+                            // first, 
+
                             // I need a smoother entrance into the orbit, and I would like the orbit to have 
                             // some structure to it, like when ants move, you can see their structure and
                             // "descipline" 

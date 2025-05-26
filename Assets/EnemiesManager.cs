@@ -11,10 +11,20 @@ public struct RadialPath
     public Vector3 m_centerPos { get; set; }
     public float m_spaceTaken { get; set; }
 
+    List<Vector3> m_radialPositions;
+    int m_numCreatures;
+
     public float spaceAvaiable()
     {
         return m_circumference - m_spaceTaken;
     }
+
+    public bool GodPleaseTellMeIfIAmInTheRightPositionOrNot(Vector3 position)
+    {
+
+        return false;
+    }
+
 };
 
 public enum PathingType
