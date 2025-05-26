@@ -24,10 +24,9 @@ public class Enemy : MonoBehaviour
     public float m_targetMaxRadiusToProtect;
     public float m_targetMinRadiusToProtect;
 
-    public RadialPath m_radialPath;
-    public PathingType m_pathingType;
+    public RadialPath m_radialPath { set; get; }
+    public PathingType m_pathingType { set; get; }
     public float m_distanceToTarget;
-
 
     bool m_isOrbiting = false;
 
@@ -57,6 +56,11 @@ public class Enemy : MonoBehaviour
         m_radialPath = rp;
     }
 
+    public void setPathingType(PathingType type)
+    {
+        m_pathingType = type;
+    }
+
     public void takeDamage(int damage)
     {
         hp -= damage;
@@ -71,6 +75,7 @@ public class Enemy : MonoBehaviour
     {
         Vector3 directionToMove = (targetDest.position - transform.position).normalized;
         rb.linearVelocity = directionToMove * velocity;
+        // Debug.Log(name + "Moving towards target");
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -83,7 +88,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
-
+        
     }
 
     void Update()

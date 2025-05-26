@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -48,6 +47,10 @@ public class EnemiesManager : MonoBehaviour
             m_enemy = GameObject.Find("Enemy");
         }
         m_enemySize = m_enemy.GetComponent<SpriteRenderer>().sprite.rect.size;
+
+        m_targetRadialPaths = new List<RadialPath>();
+
+        
     }
 
     private void Update()
@@ -61,20 +64,42 @@ public class EnemiesManager : MonoBehaviour
         }
     }
 
+    private Vector3 generateRandomPositionAtEdgesOfSpawnArea()
+    {
+        Vector3 ret = new Vector3();
+
+        float randomSign = Random.value > 0.5f ? -1.0f : 1.0f;
+
+        if (Random.value > 0.5f)
+        {
+            ret.x = Random.Range(-m_spawnArea.x, m_spawnArea.y);
+            ret.y = m_spawnArea.y * randomSign;
+        }
+        else
+        {
+            ret.x = m_spawnArea.x * randomSign;
+            ret.y = Random.Range(-m_spawnArea.x, m_spawnArea.y);
+        }
+
+        ret.z = 0.0f;
+
+        return ret;
+    }
+
     private void spawnEnemy()
     {
         if (m_spawnEnemies && m_numEnemiesSpawned < m_maxSpawns)
         {
-            Vector3 newSpawnPosition = new Vector3(
-                UnityEngine.Random.Range(-m_spawnArea.x, m_spawnArea.y),
-                UnityEngine.Random.Range(-m_spawnArea.x, m_spawnArea.y),
-                0f
-            );
+            Vector3 newSpawnPosition = generateRandomPositionAtEdgesOfSpawnArea();
 
             // better if it's near the player i guess?
-            newSpawnPosition += m_target.transform.position;
+            // newSpawnPosition += m_target.transform.position;
 
+            /* --- swarm pathing --- */
             // if the previous radial path around the target is full or it's the first, start a new one
+
+            Debug.Assert(m_targetRadialPaths != null);
+
             if (m_targetRadialPaths.Count == 0)
             {
                 RadialPath rp = new RadialPath();
@@ -84,12 +109,17 @@ public class EnemiesManager : MonoBehaviour
                 rp.m_circumference = 2 * Mathf.PI * rp.m_outerRadius - 2 * Mathf.PI * rp.m_innerRadius;
 
                 m_targetRadialPaths.Add(rp);
+                Debug.Log("creatde a radial path.");
             }
 
             GameObject newEnemy = Instantiate(m_enemy);
             newEnemy.transform.position = newSpawnPosition;
+            newEnemy.GetComponent<Enemy>().m_distanceToTarget = 0.0f;
+            // Debug.Log("enemy: [" + newEnemy.name + "] Position: [" + newSpawnPosition + "]");
             newEnemy.GetComponent<Enemy>().setTarget(m_target);
             newEnemy.GetComponent<Enemy>().setRadialPath(m_targetRadialPaths.LastOrDefault());
+            newEnemy.GetComponent<Enemy>().m_pathingType = PathingType.Radial; // is setting like this ok?
+
             newEnemy.gameObject.SetActive(true);
 
             RadialPath lastRadialPath = m_targetRadialPaths.Last();

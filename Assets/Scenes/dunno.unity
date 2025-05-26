@@ -729,8 +729,8 @@ GameObject:
   - component: {fileID: 1152905891}
   - component: {fileID: 1152905890}
   - component: {fileID: 1152905894}
-  - component: {fileID: 1152905895}
   - component: {fileID: 1152905896}
+  - component: {fileID: 1152905895}
   m_Layer: 0
   m_Name: hacker_man
   m_TagString: Untagged
@@ -1267,11 +1267,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d43f3bec22405ad40b626f112490a7ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemy: {fileID: 155288715}
-  spawnArea: {x: 10, y: 0}
-  spawnTimer: 2
-  spawnEnemies: 1
-  target: {fileID: 201115959}
+  m_enemy: {fileID: 155288715}
+  m_enemySize: {x: 0, y: 0}
+  m_spawnArea: {x: 0, y: 0}
+  m_spawnTimer: 0
+  m_spawnEnemies: 0
+  m_numEnemiesSpawned: 0
+  m_maxSpawns: 5
+  m_target: {fileID: 0}
 --- !u!4 &1946835328
 Transform:
   m_ObjectHideFlags: 0
