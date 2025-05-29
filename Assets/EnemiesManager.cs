@@ -1,31 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
-
-public struct RadialPath
-{
-    public float m_innerRadius { get; set; }
-    public float m_outerRadius { get; set; }
-    public float m_circumference { get; set; }
-    public Vector3 m_centerPos { get; set; }
-    public float m_spaceTaken { get; set; }
-
-    List<Vector3> m_radialPositions;
-    int m_numCreatures;
-
-    public float spaceAvaiable()
-    {
-        return m_circumference - m_spaceTaken;
-    }
-
-    public bool GodPleaseTellMeIfIAmInTheRightPositionOrNot(Vector3 position)
-    {
-
-        return false;
-    }
-
-};
 
 public enum PathingType
 {
@@ -34,7 +7,6 @@ public enum PathingType
 
 public class EnemiesManager : MonoBehaviour
 {
-
     public GameObject m_enemy;
     public Vector2 m_enemySize;
     public Vector2 m_spawnArea;
@@ -47,20 +19,41 @@ public class EnemiesManager : MonoBehaviour
     private float m_timer;
 
     public GameObject m_target;
-
-    List<RadialPath> m_targetRadialPaths;
+    public SwarmController m_swarmController;
 
     void Start()
     {
         if (m_enemy == null)
         {
+            Debug.LogWarning("m_enemy is not assigned...again...");
             m_enemy = GameObject.Find("Enemy");
         }
-        m_enemySize = m_enemy.GetComponent<SpriteRenderer>().sprite.rect.size;
-
-        m_targetRadialPaths = new List<RadialPath>();
-
+        SpriteRenderer enemySpriteRenderer = m_enemy.GetComponent<SpriteRenderer>();
+        if (enemySpriteRenderer != null && enemySpriteRenderer.sprite != null)
+        {
+            m_enemySize = enemySpriteRenderer.sprite.rect.size;
+        }
+        else
+        {
+            Debug.LogError("enemy sprite renderer thing is not assigned");
+            m_enemySize = Vector2.one;
+        }
         
+        if (m_swarmController == null)
+        {
+            // i asked ai and it said to do this
+            m_swarmController = FindAnyObjectByType<SwarmController>();
+            if (m_swarmController == null)
+            {
+                GameObject swarmControllerGO = new GameObject("SwarmController");
+                m_swarmController = swarmControllerGO.AddComponent<SwarmController>();
+            }
+        }
+
+        if (m_swarmController.m_radialPaths.Count == 0)
+        {
+            m_swarmController.AddRadialPath(m_target.transform.position, 2.0f, m_enemySize.magnitude);
+        }
     }
 
     private void Update()
@@ -78,17 +71,18 @@ public class EnemiesManager : MonoBehaviour
     {
         Vector3 ret = new Vector3();
 
-        float randomSign = Random.value > 0.5f ? -1.0f : 1.0f;
+        float randomSignX = Random.Range(0, 2) * 2 - 1; // -1 or 1
+        float randomSignY = Random.Range(0, 2) * 2 - 1; // -1 or 1
 
-        if (Random.value > 0.5f)
+        if (Random.value < 0.5f) // spawn on X edges
+        {
+            ret.x = m_spawnArea.x * randomSignX;
+            ret.y = Random.Range(-m_spawnArea.y, m_spawnArea.y);
+        }
+        else // spawn on Y edges
         {
             ret.x = Random.Range(-m_spawnArea.x, m_spawnArea.y);
-            ret.y = m_spawnArea.y * randomSign;
-        }
-        else
-        {
-            ret.x = m_spawnArea.x * randomSign;
-            ret.y = Random.Range(-m_spawnArea.x, m_spawnArea.y);
+            ret.y = m_spawnArea.y * randomSignY;
         }
 
         ret.z = 0.0f;
@@ -103,37 +97,27 @@ public class EnemiesManager : MonoBehaviour
             Vector3 newSpawnPosition = generateRandomPositionAtEdgesOfSpawnArea();
 
             // better if it's near the player i guess?
-            // newSpawnPosition += m_target.transform.position;
+            newSpawnPosition += m_target.transform.position;
 
-            /* --- swarm pathing --- */
-            // if the previous radial path around the target is full or it's the first, start a new one
-
-            Debug.Assert(m_targetRadialPaths != null);
-
-            if (m_targetRadialPaths.Count == 0)
-            {
-                RadialPath rp = new RadialPath();
-                rp.m_centerPos = m_target.transform.position;
-                rp.m_innerRadius = 2.0f;
-                rp.m_outerRadius = rp.m_innerRadius + m_enemySize.magnitude + 2.0f;
-                rp.m_circumference = 2 * Mathf.PI * rp.m_outerRadius - 2 * Mathf.PI * rp.m_innerRadius;
-
-                m_targetRadialPaths.Add(rp);
-                Debug.Log("creatde a radial path.");
-            }
-
-            GameObject newEnemy = Instantiate(m_enemy);
-            newEnemy.transform.position = newSpawnPosition;
-            newEnemy.GetComponent<Enemy>().m_distanceToTarget = 0.0f;
-            // Debug.Log("enemy: [" + newEnemy.name + "] Position: [" + newSpawnPosition + "]");
-            newEnemy.GetComponent<Enemy>().setTarget(m_target);
-            newEnemy.GetComponent<Enemy>().setRadialPath(m_targetRadialPaths.LastOrDefault());
-            newEnemy.GetComponent<Enemy>().m_pathingType = PathingType.Radial; // is setting like this ok?
-
+            GameObject newEnemy = Instantiate(m_enemy, newSpawnPosition, Quaternion.identity);
             newEnemy.gameObject.SetActive(true);
 
-            RadialPath lastRadialPath = m_targetRadialPaths.Last();
-            lastRadialPath.m_circumference -= m_enemySize.magnitude;
+            Enemy enemyComponent = newEnemy.GetComponent<Enemy>();
+            enemyComponent.setTarget(m_target);
+            enemyComponent.m_pathingType = PathingType.Radial;
+
+            enemyComponent.m_swarmController = m_swarmController;
+            enemyComponent.m_pathIndex = 0;
+            enemyComponent.m_indexInPath = m_numEnemiesSpawned;
+
+            Vector3 designatedPos = m_swarmController.assignCreatureToPath(
+                m_target.transform.position,
+                2.0f,
+                m_enemySize.magnitude,
+                enemyComponent.m_indexInPath
+            );
+
+            enemyComponent.setDesignatedRadialPosition(designatedPos);
             m_numEnemiesSpawned++;
         }
     }

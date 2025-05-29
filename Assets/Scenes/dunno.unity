@@ -1269,12 +1269,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_enemy: {fileID: 155288715}
   m_enemySize: {x: 0, y: 0}
-  m_spawnArea: {x: 0, y: 0}
-  m_spawnTimer: 0
-  m_spawnEnemies: 0
+  m_spawnArea: {x: 20, y: 20}
+  m_spawnTimer: 2
+  m_spawnEnemies: 1
   m_numEnemiesSpawned: 0
   m_maxSpawns: 5
-  m_target: {fileID: 0}
+  m_target: {fileID: 201115959}
 --- !u!4 &1946835328
 Transform:
   m_ObjectHideFlags: 0

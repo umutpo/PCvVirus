@@ -1,59 +1,52 @@
 using System;
-using Unity.Netcode;
-using UnityEditor.Rendering.Universal;
-using UnityEditor.Search;
 using UnityEngine;
-using UnityEngine.InputSystem.Controls;
-using UnityEngine.TextCore.Text;
 
 public class Enemy : MonoBehaviour
 {
-
-    public Transform targetDest;
+    public Transform m_targetDest;
     public float velocity;
     public float m_rotationSpeed = 2.0f;
-    public float m_currentAngleRelativeToTargetDeg;
-    public Rigidbody2D rb;
+    public Rigidbody2D m_rb;
 
-    public GameObject targetGameObject;
-    public Character targetCharacter;
+    public GameObject m_target;
+    public Character m_targetCharacter;
 
-    public int hp = 10;
-    public int collisionDamage = 1;
+    public int m_hp = 10;
+    public int m_collisionDamage = 1;
 
-    public float m_targetMaxRadiusToProtect;
-    public float m_targetMinRadiusToProtect;
-
-    public RadialPath m_radialPath { set; get; }
     public PathingType m_pathingType { set; get; }
     public float m_distanceToTarget;
 
-    bool m_isOrbiting = false;
+    private Vector3 m_designatedRadialPosition;
+    private bool m_hasDesignatedPosition = false;
+    public float m_movementSpeed = 5.0f;
+
+    public SwarmController m_swarmController;
+    public int m_pathIndex; // index in the radial path
+    public int m_indexInPath; // 
 
     private void Attack()
     {
-        if (targetCharacter == null)
+        if (m_targetCharacter == null && m_target != null)
         {
-            targetCharacter = targetGameObject.GetComponent<Character>();
+            m_targetCharacter = m_target.GetComponent<Character>();
         }
 
-        targetCharacter.TakeDamage(collisionDamage);
+        if (m_targetCharacter != null)
+        {
+            m_targetCharacter.TakeDamage(m_collisionDamage);
+        }
     }
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        m_rb = GetComponent<Rigidbody2D>();
     }
 
     public void setTarget(GameObject target)
     {
-        targetGameObject = target;
-        targetDest = target.transform;
-    }
-
-    public void setRadialPath(RadialPath rp)
-    {
-        m_radialPath = rp;
+        m_target = target;
+        m_targetDest = target.transform;
     }
 
     public void setPathingType(PathingType type)
@@ -61,11 +54,17 @@ public class Enemy : MonoBehaviour
         m_pathingType = type;
     }
 
+    public void setDesignatedRadialPosition(Vector3 position)
+    {
+        m_designatedRadialPosition = position;
+        m_hasDesignatedPosition = true;
+    }
+
     public void takeDamage(int damage)
     {
-        hp -= damage;
+        m_hp -= damage;
 
-        if (hp < 1)
+        if (m_hp < 1)
         {
             Destroy(gameObject);
         }
@@ -73,36 +72,30 @@ public class Enemy : MonoBehaviour
 
     public void moveTowardsTarget()
     {
-        Vector3 directionToMove = (targetDest.position - transform.position).normalized;
-        rb.linearVelocity = directionToMove * velocity;
-        // Debug.Log(name + "Moving towards target");
+        if (m_targetDest != null)
+        {
+            Vector3 directionToMove = (m_targetDest.position - transform.position).normalized;
+            m_rb.linearVelocity = directionToMove * velocity;
+        }
+        else
+        {
+            m_rb.linearVelocity = Vector2.zero;
+        }
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject == targetGameObject)
+        if (collision.gameObject == m_target)
         {
             Attack();
         }
     }
 
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-
-    }
-
     void FixedUpdate()
     {
-        Vector3 directionToMove = Vector3.zero;
-
-        if (targetGameObject != null)
+        if (m_target != null)
         {
-            m_distanceToTarget = Vector3.Distance(transform.position, targetGameObject.transform.position);
+            m_distanceToTarget = Vector3.Distance(transform.position, m_target.transform.position);
 
             switch (m_pathingType)
             {
@@ -112,55 +105,66 @@ public class Enemy : MonoBehaviour
 
                 case PathingType.Radial:
 
-                    if (m_distanceToTarget > m_radialPath.m_outerRadius)
+                    // I need a smoother entrance into the orbit, and I would like the orbit to have 
+                    // some structure to it, like when ants move, you can see their structure and
+                    // "descipline" 
+                    // but how...?
+
+                    if (m_swarmController != null && m_hasDesignatedPosition)
                     {
-                        m_isOrbiting = false;
-                        moveTowardsTarget();
+                        m_designatedRadialPosition = m_swarmController.GetCurrentDesignatedPosition(m_pathIndex, m_indexInPath);
                     }
 
-                    else
+                    if (m_hasDesignatedPosition)
                     {
-                        // entering the orbit range, set the initial direction
-                        if (m_isOrbiting == false)
+                        float distanceToDesignated = Vector3.Distance(transform.position, m_designatedRadialPosition);
+                        if (distanceToDesignated < 0.1f)
                         {
-                            Vector3 direction = (transform.position - targetDest.position).normalized;
-                            m_currentAngleRelativeToTargetDeg = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                            m_isOrbiting = true;
-                        }
+                            m_rb.linearVelocity = Vector2.zero;
 
+                            if (m_target != null)
+                            {
+                                Vector3 directionToTarget = (m_target.transform.position - transform.position).normalized;
+                                float angle = Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg;
+                                Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle + 90f);
+                                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, m_rotationSpeed * Time.fixedDeltaTime);
+                            }
+                        }
                         else
                         {
-                            // otherwise increment the angle by rotationSpeed
-                            m_currentAngleRelativeToTargetDeg += m_rotationSpeed * Time.fixedDeltaTime;
-                            float angleRad = m_currentAngleRelativeToTargetDeg * Mathf.Deg2Rad;
+                            Vector3 directionToDesignated = (m_designatedRadialPosition - transform.position).normalized;
+                            m_rb.linearVelocity = directionToDesignated * m_movementSpeed;
 
-                            // now here I want to control how much speed so that they stay in a specific rotating orbit position
-                            // so they accelrate to their position in a natural way and then stay at a constant "swarm velocity"
-                            // first, 
 
-                            // I need a smoother entrance into the orbit, and I would like the orbit to have 
-                            // some structure to it, like when ants move, you can see their structure and
-                            // "descipline" 
-                            // but how...?
-
-                            Vector3 orbitPosition = targetDest.position + new Vector3(
-                                Mathf.Cos(angleRad) * m_targetMinRadiusToProtect,
-                                Mathf.Sin(angleRad) * m_targetMinRadiusToProtect,
-                                0f
-                            );
-
-                            rb.linearVelocity = (orbitPosition - transform.position) / Time.fixedDeltaTime;
+                            if (m_target != null)
+                            {
+                                Vector3 directionToTarget = (m_target.transform.position - transform.position).normalized;
+                                float angle = Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg;
+                                Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle + 90f);
+                                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, m_rotationSpeed * Time.fixedDeltaTime);
+                            }
                         }
 
-                        // next thing i wanna do is control velocity of the objects to kill the deadspace inside
-                        // probably should have points sent to it by enemiesManager...
+                        // // old orbit code
+                        //  Vector3 orbitPosition = targetDest.position + new Vector3(
+                        //  Mathf.Cos(angleRad) * m_targetMinRadiusToProtect,
+                        //  Mathf.Sin(angleRad) * m_targetMinRadiusToProtect,
+                        //     0f
+                        //  );
+
+                        //  rb.linearVelocity = (orbitPosition - transform.position) / Time.fixedDeltaTime;
+                    }
+                    else
+                    {
+                        moveTowardsTarget();
                     }
                     break;
             }
         }
         else
         {
-            directionToMove = Vector3.zero;
+            Debug.Log("No target found, stopping movement.");
+            m_rb.linearVelocity = Vector2.zero;
         }
     }
 }
