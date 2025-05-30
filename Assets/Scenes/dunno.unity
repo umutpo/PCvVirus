@@ -244,18 +244,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8c016764a0908f4eb04ced69e03dd0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetDest: {fileID: 0}
-  velocity: 1
+  m_targetDest: {fileID: 0}
+  velocity: 10
   m_rotationSpeed: 50
-  m_currentAngleRelativeToTargetDeg: 0
-  rb: {fileID: 0}
-  targetGameObject: {fileID: 0}
-  targetCharacter: {fileID: 0}
-  hp: 10
-  collisionDamage: 1
-  m_targetMaxRadiusToProtect: 3
-  m_targetMinRadiusToProtect: 2
+  m_rb: {fileID: 0}
+  m_target: {fileID: 0}
+  m_targetCharacter: {fileID: 0}
+  m_hp: 10
+  m_collisionDamage: 1
   m_distanceToTarget: 0
+  m_movementSpeed: 10
+  m_swarmController: {fileID: 0}
+  m_pathIndex: 0
+  m_indexInPath: 0
 --- !u!50 &155288720
 Rigidbody2D:
   serializedVersion: 5
@@ -1270,11 +1271,12 @@ MonoBehaviour:
   m_enemy: {fileID: 155288715}
   m_enemySize: {x: 0, y: 0}
   m_spawnArea: {x: 20, y: 20}
-  m_spawnTimer: 2
+  m_spawnTimer: 0.5
   m_spawnEnemies: 1
   m_numEnemiesSpawned: 0
-  m_maxSpawns: 5
+  m_maxSpawns: 10
   m_target: {fileID: 201115959}
+  m_swarmController: {fileID: 0}
 --- !u!4 &1946835328
 Transform:
   m_ObjectHideFlags: 0

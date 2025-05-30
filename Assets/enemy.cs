@@ -130,6 +130,7 @@ public class Enemy : MonoBehaviour
                                 transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, m_rotationSpeed * Time.fixedDeltaTime);
                             }
                         }
+
                         else
                         {
                             Vector3 directionToDesignated = (m_designatedRadialPosition - transform.position).normalized;
