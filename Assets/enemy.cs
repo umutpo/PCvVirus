@@ -25,6 +25,18 @@ public class Enemy : MonoBehaviour
     public int m_pathIndex; // index in the radial path
     public int m_indexInPath; // 
 
+    // sprite
+    public Vector2 m_spriteSize;
+
+    private void Start()
+    {
+        SpriteRenderer enemySpriteRenderer = GetComponent<SpriteRenderer>();
+        if (enemySpriteRenderer != null && enemySpriteRenderer.sprite != null)
+        {
+            m_spriteSize = enemySpriteRenderer.sprite.rect.size;
+        } 
+    }
+
     private void Attack()
     {
         if (m_targetCharacter == null && m_target != null)

@@ -8,7 +8,6 @@ public enum PathingType
 public class EnemiesManager : MonoBehaviour
 {
     public GameObject m_enemy;
-    public Vector2 m_enemySize;
     public Vector2 m_spawnArea;
     public float m_spawnTimer;
     public bool m_spawnEnemies;
@@ -28,16 +27,6 @@ public class EnemiesManager : MonoBehaviour
             Debug.LogWarning("m_enemy is not assigned...again...");
             m_enemy = GameObject.Find("Enemy");
         }
-        SpriteRenderer enemySpriteRenderer = m_enemy.GetComponent<SpriteRenderer>();
-        if (enemySpriteRenderer != null && enemySpriteRenderer.sprite != null)
-        {
-            m_enemySize = enemySpriteRenderer.sprite.rect.size;
-        }
-        else
-        {
-            Debug.LogError("enemy sprite renderer thing is not assigned");
-            m_enemySize = Vector2.one;
-        }
         
         if (m_swarmController == null)
         {
@@ -52,7 +41,7 @@ public class EnemiesManager : MonoBehaviour
 
         if (m_swarmController.m_radialPaths.Count == 0)
         {
-            m_swarmController.AddRadialPath(m_target.transform.position, 2.0f, m_enemySize.magnitude);
+            m_swarmController.addRadialPath(m_target.transform.position, 2.0f);
         }
     }
 
@@ -96,6 +85,20 @@ public class EnemiesManager : MonoBehaviour
         {
             Vector3 newSpawnPosition = generateRandomPositionAtEdgesOfSpawnArea();
 
+            if (m_target == null)
+            {
+                Debug.LogWarning("m_target is not assigned, using default target position (0,0,0)");
+                m_target = new GameObject("DefaultTarget");
+                m_target.transform.position = Vector3.zero;
+                m_swarmController.m_targetCenterPos = m_target.transform.position;
+            }
+
+            if (m_swarmController.m_targetCenterPos == null)
+            {
+                Debug.LogWarning("m_swarmController.m_targetCenterPos is not set, using m_target position");
+                m_swarmController.m_targetCenterPos = m_target.transform.position;
+            }
+
             // better if it's near the player i guess?
             newSpawnPosition += m_target.transform.position;
 
@@ -107,17 +110,12 @@ public class EnemiesManager : MonoBehaviour
             enemyComponent.m_pathingType = PathingType.Radial;
 
             enemyComponent.m_swarmController = m_swarmController;
-            enemyComponent.m_pathIndex = 0;
-            enemyComponent.m_indexInPath = m_numEnemiesSpawned;
 
-            Vector3 designatedPos = m_swarmController.assignCreatureToPath(
-                m_target.transform.position,
-                2.0f,
-                m_enemySize.magnitude,
-                enemyComponent.m_indexInPath
-            );
+            // these should be managed by SwarmController
+            // enemyComponent.m_pathIndex = 0;
+            // enemyComponent.m_indexInPath = m_numEnemiesSpawned;
 
-            enemyComponent.setDesignatedRadialPosition(designatedPos);
+            m_swarmController.assignCreatureToSwarm(newEnemy.GetComponent<Enemy>());
             m_numEnemiesSpawned++;
         }
     }
