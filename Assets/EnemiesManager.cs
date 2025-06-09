@@ -106,16 +106,12 @@ public class EnemiesManager : MonoBehaviour
             newEnemy.gameObject.SetActive(true);
 
             Enemy enemyComponent = newEnemy.GetComponent<Enemy>();
+            enemyComponent.setSpriteSize(); // ill fix this later
             enemyComponent.setTarget(m_target);
             enemyComponent.m_pathingType = PathingType.Radial;
-
             enemyComponent.m_swarmController = m_swarmController;
-
-            // these should be managed by SwarmController
-            // enemyComponent.m_pathIndex = 0;
-            // enemyComponent.m_indexInPath = m_numEnemiesSpawned;
-
             m_swarmController.assignCreatureToSwarm(newEnemy.GetComponent<Enemy>());
+
             m_numEnemiesSpawned++;
         }
     }

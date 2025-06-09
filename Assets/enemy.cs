@@ -30,11 +30,17 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
+         
+    }
+
+    public void setSpriteSize()
+    {
         SpriteRenderer enemySpriteRenderer = GetComponent<SpriteRenderer>();
         if (enemySpriteRenderer != null && enemySpriteRenderer.sprite != null)
         {
             m_spriteSize = enemySpriteRenderer.sprite.rect.size;
-        } 
+            Debug.Log($"Enemy sprite size: {m_spriteSize}");
+        }
     }
 
     private void Attack()
