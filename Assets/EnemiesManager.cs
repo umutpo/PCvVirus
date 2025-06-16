@@ -36,12 +36,8 @@ public class EnemiesManager : MonoBehaviour
             {
                 GameObject swarmControllerGO = new GameObject("SwarmController");
                 m_swarmController = swarmControllerGO.AddComponent<SwarmController>();
+                m_swarmController.m_targetCenterPos = m_target.transform.position;
             }
-        }
-
-        if (m_swarmController.m_radialPaths.Count == 0)
-        {
-            m_swarmController.addRadialPath(m_target.transform.position, 2.0f);
         }
     }
 

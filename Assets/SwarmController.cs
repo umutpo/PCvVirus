@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public struct RadialPath
@@ -25,10 +22,10 @@ public struct RadialPath
     {
         m_centerPos = center;
         m_innerRadius = innerRadius;
-        m_outerRadius = innerRadius + 0.1f; // will be adjusted based on sprite size when creatures are added
+        m_outerRadius = innerRadius + 1.0f; // will be adjusted based on sprite size when creatures are added
         m_rotatedRadius = (m_outerRadius + m_innerRadius) / 2.0f;
         m_area = Mathf.PI * ((m_outerRadius * m_outerRadius) - (m_innerRadius * m_innerRadius));
-        m_availableSpace = -1.0f;
+        m_availableSpace = Mathf.PI * 2.0f * (m_rotatedRadius / 2.0f);
         m_numCreaturesOnPath = 0;
         m_angleBetweenCreatures = 0f;
         m_currentRotationAngle = 0f;
@@ -74,11 +71,11 @@ public struct RadialPath
         if (m_currentRotationAngle < 0f) m_currentRotationAngle += 360f;
     }
 
+    // creatureSize in world units, not pixels
     public bool canAcceptNewCreature(Vector2 creatureSize)
     {
         // picking the max between x and y is not great. The alternative is to rebalance the swarm 
         // when the creature's larger axis crosses the normal with the core, bleh, dont feel like doing that... 
-        Debug.Log("canAcceptNewCreature called with creature size: " + creatureSize);
         float spaceRequired = Mathf.Max(creatureSize.x, creatureSize.y) * m_annulusSpacingFactor;
         float spaceRemaining = m_availableSpace - spaceRequired;
         Debug.Log($"Checking if path can accept new creature. Required space: {spaceRequired}, Available space: {m_availableSpace}, Remaining space: {spaceRemaining}");
@@ -88,7 +85,8 @@ public struct RadialPath
     public void addCreature(int pathIndex, Enemy newCreature)
     {
         // if the new creature is larger than the path's annulus length, we need to expand the path's radius
-        float maxCreatureSize = Mathf.Max(newCreature.m_spriteSize.x, newCreature.m_spriteSize.y);
+        float maxCreatureSize = Mathf.Max(newCreature.m_spriteSize.x, newCreature.m_spriteSize.y) / newCreature.m_ppu;
+        
         if (maxCreatureSize > (m_outerRadius - m_innerRadius))
         {
             Debug.LogWarning($"Creature size {maxCreatureSize} exceeds path radius {m_outerRadius - m_innerRadius}. Expanding path Radius");
@@ -98,7 +96,7 @@ public struct RadialPath
         }
 
         // add the creature
-        float spaceRequired = Mathf.Max(newCreature.m_spriteSize.x, newCreature.m_spriteSize.y) * m_annulusSpacingFactor;
+        float spaceRequired = Mathf.Max(newCreature.m_spriteSize.x, newCreature.m_spriteSize.y) / newCreature.m_ppu * m_annulusSpacingFactor;
         m_availableSpace -= spaceRequired;
         m_numCreaturesOnPath++;
 
@@ -111,7 +109,7 @@ public struct RadialPath
 
     public void removeCreature(Enemy creatureToRemove)
     {
-        float spaceRequired = Mathf.Max(creatureToRemove.m_spriteSize.x, creatureToRemove.m_spriteSize.y) * m_annulusSpacingFactor;
+        float spaceRequired = Mathf.Max(creatureToRemove.m_spriteSize.x, creatureToRemove.m_spriteSize.y) / creatureToRemove.m_ppu * m_annulusSpacingFactor;
         m_availableSpace += spaceRequired;
         Debug.Assert(m_availableSpace <= getMaxAvailableSpace(), "Available space exceeded max space after removing creature!");
         m_numCreaturesOnPath--;
@@ -146,11 +144,12 @@ public struct RadialPath
 
 public class SwarmController : MonoBehaviour
 {
+    [SerializeField]
     public List<RadialPath> m_radialPaths;
     public Vector3 m_targetCenterPos;
 
-    public float m_pathRotationSpeed = 10.0f;
-    public float m_spaceBetweenRadialPaths = 2.0f;
+    public float m_pathRotationSpeed = 100.0f;
+    public float m_spaceBetweenRadialPaths = 0.2f;
 
     void Awake()
     {
@@ -181,18 +180,17 @@ public class SwarmController : MonoBehaviour
         }
     }
 
-    public void addRadialPath(Vector3 centerPos, float outerRadius)
+    public void addRadialPath(Vector3 centerPos, float innerRadius)
     {
-        RadialPath newPath = new RadialPath(centerPos, outerRadius);
+        RadialPath newPath = new RadialPath(centerPos, innerRadius);
         m_radialPaths.Add(newPath);
-        Debug.Log($"added new radial path. total paths: {m_radialPaths.Count}");
+        Debug.Log($"added new radial path. IR: {newPath.m_innerRadius}, OR {newPath.m_outerRadius}, RR: {newPath.m_rotatedRadius}, Free Space: {newPath.m_availableSpace}, total paths: {m_radialPaths.Count}");
     }
 
     public void addCreatureToLastRadialPath(Enemy newEnemy)
     {
         // assuming the paths are balanced, a simple first step is to always add new enemies at the outer-most ring
         RadialPath targetRadialPath = m_radialPaths.Last();
-        Debug.Log("addCreatureToLastRadialPath - enemySpriteSize: " + newEnemy.m_spriteSize);
 
         if (targetRadialPath.m_numCreaturesOnPath == 0)
         {
@@ -204,7 +202,7 @@ public class SwarmController : MonoBehaviour
             return;
         }
 
-        bool canFitIntoPath = targetRadialPath.canAcceptNewCreature(newEnemy.m_spriteSize);
+        bool canFitIntoPath = targetRadialPath.canAcceptNewCreature(newEnemy.m_spriteSize / newEnemy.m_ppu);
         if (canFitIntoPath)
         {
             int pathIndex = m_radialPaths.Count - 1;
@@ -225,7 +223,7 @@ public class SwarmController : MonoBehaviour
     {
         if (m_radialPaths.Count == 0)
         {
-            return 2.0f; // default radius for the first path
+            return 0.3f; // default radius for the first path
         }
         else
         {
