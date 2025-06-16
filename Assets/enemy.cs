@@ -27,10 +27,11 @@ public class Enemy : MonoBehaviour
 
     // sprite
     public Vector2 m_spriteSize;
+    public float m_ppu;
 
     private void Start()
     {
-         
+
     }
 
     public void setSpriteSize()
@@ -39,7 +40,7 @@ public class Enemy : MonoBehaviour
         if (enemySpriteRenderer != null && enemySpriteRenderer.sprite != null)
         {
             m_spriteSize = enemySpriteRenderer.sprite.rect.size;
-            Debug.Log($"Enemy sprite size: {m_spriteSize}");
+            m_ppu = enemySpriteRenderer.sprite.pixelsPerUnit;
         }
     }
 
@@ -128,9 +129,10 @@ public class Enemy : MonoBehaviour
                     // "descipline" 
                     // but how...?
 
-                    if (m_swarmController != null && m_hasDesignatedPosition)
+                    if (m_swarmController != null)
                     {
                         m_designatedRadialPosition = m_swarmController.GetCurrentDesignatedPosition(m_pathIndex, m_indexInPath);
+                        m_hasDesignatedPosition = true;
                     }
 
                     if (m_hasDesignatedPosition)
