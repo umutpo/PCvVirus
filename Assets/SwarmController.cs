@@ -25,7 +25,7 @@ public struct RadialPath
         m_outerRadius = innerRadius + 1.0f; // will be adjusted based on sprite size when creatures are added
         m_rotatedRadius = (m_outerRadius + m_innerRadius) / 2.0f;
         m_area = Mathf.PI * ((m_outerRadius * m_outerRadius) - (m_innerRadius * m_innerRadius));
-        m_availableSpace = Mathf.PI * 2.0f * (m_rotatedRadius / 2.0f);
+        m_availableSpace = Mathf.PI * 2.0f * m_rotatedRadius;
         m_numCreaturesOnPath = 0;
         m_angleBetweenCreatures = 0f;
         m_currentRotationAngle = 0f;
@@ -223,7 +223,7 @@ public class SwarmController : MonoBehaviour
     {
         if (m_radialPaths.Count == 0)
         {
-            return 0.3f; // default radius for the first path
+            return 0.75f; // default radius for the first path
         }
         else
         {
