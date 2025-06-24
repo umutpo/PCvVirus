@@ -15,6 +15,9 @@ public class virusMovement : MonoBehaviour
     public InputActionReference moveInput;
     public InputActionReference fireInput;
 
+    [SerializeField] private float horizontalBound = 10f;
+    [SerializeField] private float verticalBound = 10f;
+
     private GameObject weapon;
 
     private void Awake()
@@ -72,7 +75,12 @@ public class virusMovement : MonoBehaviour
         else
         {
             Debug.LogWarning("Move input action is not set.");
-        }        
+        }
+        gameObject.transform.position = new Vector3(
+            Mathf.Clamp(gameObject.transform.position.x, - horizontalBound, horizontalBound),
+            Mathf.Clamp(gameObject.transform.position.y, - verticalBound, verticalBound),
+            gameObject.transform.position.z
+        );
     }
 
     private void FixedUpdate()

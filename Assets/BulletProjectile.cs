@@ -38,6 +38,11 @@ public class BulletProjectile : MonoBehaviour
                 hitDetected = true;
                 break;
             }
+            if (c.GetComponent<ComputerCoreController>())
+            {
+                c.GetComponent<ComputerCoreController>().takeDamage(bulletDamage);
+                hitDetected = true;
+            }
         }
 
         if (hitDetected) {
