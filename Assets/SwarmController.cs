@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UnityEngine;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public struct RadialPath
 {
@@ -140,6 +143,14 @@ public struct RadialPath
 
         RecalculateDesignatedPositions();
     }
+}
+
+public struct SnakePath
+{
+    public Vector2 m_size;
+    public float m_area;
+    public Vector3 m_headPosition;
+    public List<Vector3> m_splinePositions;
 }
 
 public class SwarmController : MonoBehaviour

@@ -8,7 +8,8 @@ public class Enemy : MonoBehaviour
     public float m_rotationSpeed = 2.0f;
     public Rigidbody2D m_rb;
 
-    public GameObject m_target;
+    public GameObject m_defenseTarget;
+    public GameObject m_attackTarget;
     public Character m_targetCharacter;
 
     public int m_hp = 10;
@@ -46,13 +47,14 @@ public class Enemy : MonoBehaviour
 
     private void Attack()
     {
-        if (m_targetCharacter == null && m_target != null)
+        if (m_targetCharacter == null && m_defenseTarget != null)
         {
-            m_targetCharacter = m_target.GetComponent<Character>();
+            m_targetCharacter = m_attackTarget.GetComponent<Character>();
         }
 
         if (m_targetCharacter != null)
         {
+            Debug.Log("Attacking target: " + m_targetCharacter.name);
             m_targetCharacter.TakeDamage(m_collisionDamage);
         }
     }
@@ -62,10 +64,16 @@ public class Enemy : MonoBehaviour
         m_rb = GetComponent<Rigidbody2D>();
     }
 
-    public void setTarget(GameObject target)
+    public void setDefenseTarget(GameObject defenseTarget)
     {
-        m_target = target;
-        m_targetDest = target.transform;
+        m_defenseTarget = defenseTarget;
+        m_targetDest = defenseTarget.transform;
+    }
+
+    public void setAttackTarget(GameObject attackTarget)
+    {
+        m_attackTarget = attackTarget;
+        m_targetCharacter = attackTarget.GetComponent<Character>();
     }
 
     public void setPathingType(PathingType type)
@@ -104,7 +112,7 @@ public class Enemy : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject == m_target)
+        if (collision.gameObject == m_attackTarget)
         {
             Attack();
         }
@@ -112,9 +120,9 @@ public class Enemy : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (m_target != null)
+        if (m_defenseTarget != null)
         {
-            m_distanceToTarget = Vector3.Distance(transform.position, m_target.transform.position);
+            m_distanceToTarget = Vector3.Distance(transform.position, m_defenseTarget.transform.position);
 
             switch (m_pathingType)
             {
@@ -142,9 +150,9 @@ public class Enemy : MonoBehaviour
                         {
                             m_rb.linearVelocity = Vector2.zero;
 
-                            if (m_target != null)
+                            if (m_defenseTarget != null)
                             {
-                                Vector3 directionToTarget = (m_target.transform.position - transform.position).normalized;
+                                Vector3 directionToTarget = (m_defenseTarget.transform.position - transform.position).normalized;
                                 float angle = Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg;
                                 Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle + 90f);
                                 transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, m_rotationSpeed * Time.fixedDeltaTime);
@@ -157,9 +165,9 @@ public class Enemy : MonoBehaviour
                             m_rb.linearVelocity = directionToDesignated * m_movementSpeed;
 
 
-                            if (m_target != null)
+                            if (m_defenseTarget != null)
                             {
-                                Vector3 directionToTarget = (m_target.transform.position - transform.position).normalized;
+                                Vector3 directionToTarget = (m_defenseTarget.transform.position - transform.position).normalized;
                                 float angle = Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg;
                                 Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle + 90f);
                                 transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, m_rotationSpeed * Time.fixedDeltaTime);
