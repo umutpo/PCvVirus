@@ -145,14 +145,6 @@ public struct RadialPath
     }
 }
 
-public struct SnakePath
-{
-    public Vector2 m_size;
-    public float m_area;
-    public Vector3 m_headPosition;
-    public List<Vector3> m_splinePositions;
-}
-
 public class SwarmController : MonoBehaviour
 {
     [SerializeField]
