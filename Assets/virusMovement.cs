@@ -6,14 +6,21 @@ public class virusMovement : MonoBehaviour
     public Rigidbody2D rb;
     public Vector2 _moveDirection;
 
+    [Header("Movement Settings")]
     public float frameVelocity;
     public float targetVelocity = 5f;
     public float maxVelocity = 10f;
     public float acceleration = 0.5f;
+    private bool m_canDash = true;
+    private bool m_isDashing = false;
+    private float m_dashingPower = 2f;
+    private float m_dashingTime = 0.2f;
+    private float m_dashingCooldown = 1f;
 
     [Header("Input Actions")]
     public InputActionReference moveInput;
     public InputActionReference fireInput;
+    public InputActionReference dashInput;
 
     [SerializeField] private float horizontalBound = 10f;
     [SerializeField] private float verticalBound = 10f;
@@ -51,6 +58,14 @@ public class virusMovement : MonoBehaviour
         {
             Debug.LogWarning("Move input action is not set.");
         }
+        if (dashInput != null && dashInput.action != null)
+        {
+            dashInput.action.Enable();
+        }
+        else
+        {
+            Debug.LogWarning("Dash input action is not set.");
+        }
     }
 
     private void OnDisable()
@@ -64,6 +79,10 @@ public class virusMovement : MonoBehaviour
         {
             moveInput.action.Disable();
         }
+        if (dashInput != null && dashInput.action != null)
+        {
+            dashInput.action.Disable();
+        }
     }
 
     void Update()
@@ -76,6 +95,15 @@ public class virusMovement : MonoBehaviour
         {
             Debug.LogWarning("Move input action is not set.");
         }
+
+        if (dashInput != null && dashInput.action != null)
+        {
+            if (dashInput.action.triggered)
+            {
+                m_dash = true;
+            }
+        }
+
         gameObject.transform.position = new Vector3(
             Mathf.Clamp(gameObject.transform.position.x, - horizontalBound, horizontalBound),
             Mathf.Clamp(gameObject.transform.position.y, - verticalBound, verticalBound),
@@ -92,7 +120,6 @@ public class virusMovement : MonoBehaviour
     {
         if (rb != null)
         {
-
             if (_moveDirection == Vector2.zero)
             {
                 frameVelocity = 0f;

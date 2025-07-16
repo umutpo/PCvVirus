@@ -248,7 +248,8 @@ MonoBehaviour:
   velocity: 10
   m_rotationSpeed: 50
   m_rb: {fileID: 1152905891}
-  m_target: {fileID: 1152905888}
+  m_defenseTarget: {fileID: 0}
+  m_attackTarget: {fileID: 0}
   m_targetCharacter: {fileID: 1152905896}
   m_hp: 10
   m_collisionDamage: 1
@@ -1538,7 +1539,8 @@ MonoBehaviour:
   m_spawnEnemies: 1
   m_numEnemiesSpawned: 0
   m_maxSpawns: 2
-  m_target: {fileID: 201115959}
+  m_defenseTarget: {fileID: 201115959}
+  m_attackTarget: {fileID: 1152905888}
   m_swarmController: {fileID: 0}
 --- !u!4 &1946835328
 Transform:
